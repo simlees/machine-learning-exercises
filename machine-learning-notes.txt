@@ -1,6 +1,5 @@
-More complex and unsupervised algorithms can be good at discerning relationships between datasets
+More complex and unsupervised algorithms can be good at discerning relationships between datasets.
 
-Labelled - Data that is described, eg this photo contains a person
-Unlabelled - Data without any 'meta information' eg photograph, newspaper etc
+Useless or irrelevant features can add noise and inhibit machine learning
 
 With ML, can't work with NaN / patchy data. Replacing with extreme value means it's treated as an outlier
