@@ -1,5 +1,0 @@
-FEATURE - input, ie column of data
-LABEL - output or what you're attempting to predict
-LABELLED - data that is described, eg photo contains dog
-UNLABELLED - data without meta information
-OVERFITTING - training and validating model with same data (very bad)

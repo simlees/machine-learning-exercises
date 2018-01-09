@@ -8,10 +8,13 @@ Supervised Learning - boils down to features (attributes/continuous data) and la
 
 import pandas as pd
 import numpy as np
-import quandl
-import math
+import quandl, datetime, math
 from sklearn import preprocessing, cross_validation, svm
 from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+from matplotlib import style
+
+style.use('ggplot')
 
 quandl.ApiConfig.api_key = "7hZPqQqG7V3t1pLqvsRT"
 
@@ -24,18 +27,19 @@ df = df[['Adj. Close','HL_PCT','PCT_change','Adj. Volume']]
 forecast_col = 'Adj. Close'
 
 df.fillna(-99999, inplace=True) # Fill NaN's
-print(df.tail())
 
 forecast_out = int(math.ceil(0.01*len(df))) # Integer - 10% length of data
 # forecast_out = 10
 
 df['label'] = df[forecast_col].shift(-forecast_out)
-df.dropna(inplace=True)
-print(df.tail())
 
 X = np.array(df.drop(['label'],1)) # Features
-y = np.array(df['label']) # Labels
 X = preprocessing.scale(X)
+X = X[:-forecast_out]
+X_lately = X[-forecast_out:]
+
+df.dropna(inplace=True)
+y = np.array(df['label']) # Labels
 y = np.array(df['label'])
 
 # Helper method to split features (X) and labels (y) into training and test data (60/40) split. Test size is % of data used
@@ -46,4 +50,24 @@ clf = svm.SVR() # Support Vector Regression
 clf.fit(X_train, y_train) # Train
 accuracy = clf.score(X_test, y_test)
 
-print(accuracy)
+forecast_set = clf.predict(X_lately)
+
+print(forecast_set, accuracy, forecast_out)
+df['Forecast'] = np.nan
+
+last_date = df.iloc[-1].name
+last_unix = last_date.timestamp()
+one_day = 86400
+next_unix = last_unix + one_day
+
+for i in forecast_set:
+    next_date = datetime.datetime.fromtimestamp(next_unix)
+    next_unix += one_day
+    df.loc[next_date] = [np.nan for _ in range(len(df.columns)-1)] + [i]
+
+df['Adj. Close'].plot()
+df['Forecast'].plot()
+plt.legend(loc=4)
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.show()
